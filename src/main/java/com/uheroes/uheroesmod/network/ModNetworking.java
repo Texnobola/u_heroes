@@ -59,18 +59,30 @@ public class ModNetworking {
         });
     }
 
+    private static final float[] SIZES = {0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
+
     private static void handleSizeChange(final SizeChangePayload payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
             if (player != null && player.getPersistentData().getBoolean("is_blacks")) {
                 ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                 float currentScale = scaleData.getTargetScale();
-                float newScale;
+                float newScale = currentScale;
                 
                 if (payload.isGrowing()) {
-                    newScale = Math.min(5.0f, currentScale + 1.0f);
+                    for (float size : SIZES) {
+                        if (size > currentScale + 0.01f) {
+                            newScale = size;
+                            break;
+                        }
+                    }
                 } else {
-                    newScale = Math.max(0.1f, currentScale - 0.5f);
+                    for (int i = SIZES.length - 1; i >= 0; i--) {
+                        if (SIZES[i] < currentScale - 0.01f) {
+                            newScale = SIZES[i];
+                            break;
+                        }
+                    }
                 }
                 
                 scaleData.setTargetScale(newScale);

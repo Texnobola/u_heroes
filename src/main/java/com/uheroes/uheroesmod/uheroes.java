@@ -1,5 +1,6 @@
 package com.uheroes.uheroesmod;
 
+import com.uheroes.uheroesmod.registry.ModEffects;
 import com.uheroes.uheroesmod.registry.ModEntities;
 import com.uheroes.uheroesmod.registry.ModItems;
 import net.neoforged.bus.api.IEventBus;
@@ -16,6 +17,7 @@ public class uheroes {
     public uheroes(IEventBus modEventBus) {
         ModItems.register(modEventBus);
         ModEntities.register(modEventBus);
+        ModEffects.register(modEventBus);
 
         modEventBus.addListener(this::onClientSetup);
         NeoForge.EVENT_BUS.register(this);
