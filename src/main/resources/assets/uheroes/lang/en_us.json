@@ -1,4 +1,8 @@
 {
   "item.uheroes.thief_chip": "Thief Chip",
-  "item.uheroes.hero_chooser": "Hero Chooser"
+  "item.uheroes.hero_chooser": "Hero Chooser",
+  "effect.uheroes.stuck_in_atom": "Stuck in Atom",
+  "key.uheroes.grow": "Grow",
+  "key.uheroes.shrink": "Shrink",
+  "key.categories.uheroes": "U-Heroes"
 }
