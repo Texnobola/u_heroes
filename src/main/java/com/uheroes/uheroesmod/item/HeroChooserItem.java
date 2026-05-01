@@ -1,8 +1,7 @@
 package com.uheroes.uheroesmod.item;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import com.uheroes.uheroesmod.client.screen.HeroChooserScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -18,16 +17,9 @@ public class HeroChooserItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!level.isClientSide()) {
-            player.getPersistentData().putBoolean("is_blacks", true);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 1.0F, 1.0F);
-            
-            if (!player.getAbilities().instabuild) {
-                stack.shrink(1);
-            }
-
-            player.sendSystemMessage(Component.literal("[U-Heroes] You have awakened as BlackS"));
+        if (level.isClientSide()) {
+            Minecraft.getInstance().setScreen(new HeroChooserScreen());
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return InteractionResultHolder.success(stack);
     }
 }
