@@ -1,8 +1,11 @@
 package com.uheroes.uheroesmod.network;
 
+import com.uheroes.uheroesmod.entity.BlackSCloneEntity;
+import com.uheroes.uheroesmod.registry.ModEntities;
 import com.uheroes.uheroesmod.registry.ModItems;
 import com.uheroes.uheroesmod.world.data.FluxData;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -18,12 +21,15 @@ import virtuoel.pehkui.api.ScaleTypes;
 @EventBusSubscriber(modid = "uheroes", bus = EventBusSubscriber.Bus.MOD)
 public class ModNetworking {
 
+    private static final float[] SIZES = {0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
+
     @SubscribeEvent
     public static void register(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("uheroes");
         registrar.playToServer(HeroSelectPayload.TYPE, HeroSelectPayload.CODEC, ModNetworking::handleHeroSelect);
         registrar.playToClient(SyncHeroDataPayload.TYPE, SyncHeroDataPayload.CODEC, ModNetworking::handleSyncHeroData);
         registrar.playToServer(SizeChangePayload.TYPE, SizeChangePayload.CODEC, ModNetworking::handleSizeChange);
+        registrar.playToServer(SummonClonePayload.TYPE, SummonClonePayload.CODEC, ModNetworking::handleSummonClone);
     }
 
     private static void handleSyncHeroData(final SyncHeroDataPayload payload, final IPayloadContext context) {
@@ -59,8 +65,6 @@ public class ModNetworking {
         });
     }
 
-    private static final float[] SIZES = {0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
-
     private static void handleSizeChange(final SizeChangePayload payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
@@ -87,6 +91,50 @@ public class ModNetworking {
                 
                 scaleData.setTargetScale(newScale);
                 scaleData.setScaleTickDelay(100);
+            }
+        });
+    }
+
+    private static void handleSummonClone(final SummonClonePayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Player player = context.player();
+            if (player != null && player.getPersistentData().getBoolean("is_blacks")) {
+                if (player.getPersistentData().getInt("clone_cooldown") > 0) {
+                    player.displayClientMessage(Component.literal("Clone on cooldown!"), true);
+                    return;
+                }
+
+                int cost = payload.isMass() ? 55 : 10;
+                int cooldown = payload.isMass() ? 1200 : 300;
+
+                if (FluxData.consumeFlux(player, cost)) {
+                    ServerLevel level = (ServerLevel) player.level();
+                    
+                    if (payload.isMass()) {
+                        for (int i = 0; i < 5; i++) {
+                            double angle = (2 * Math.PI / 5) * i;
+                            double dx = Math.cos(angle) * 2.0;
+                            double dz = Math.sin(angle) * 2.0;
+                            
+                            BlackSCloneEntity clone = ModEntities.BLACKS_CLONE.get().create(level);
+                            if (clone != null) {
+                                clone.setPos(player.getX() + dx, player.getY(), player.getZ() + dz);
+                                clone.getPersistentData().putString("owner_id", player.getUUID().toString());
+                                level.addFreshEntity(clone);
+                            }
+                        }
+                    } else {
+                        BlackSCloneEntity clone = ModEntities.BLACKS_CLONE.get().create(level);
+                        if (clone != null) {
+                            clone.setPos(player.getX(), player.getY(), player.getZ());
+                            clone.getPersistentData().putString("owner_id", player.getUUID().toString());
+                            level.addFreshEntity(clone);
+                        }
+                    }
+                    
+                    level.playSound(null, player.blockPosition(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.0f, 1.0f);
+                    player.getPersistentData().putInt("clone_cooldown", cooldown);
+                }
             }
         });
     }

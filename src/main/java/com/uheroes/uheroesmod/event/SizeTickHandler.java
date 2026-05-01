@@ -35,6 +35,12 @@ public class SizeTickHandler {
                         }
                     }
                 }
+
+                // Decrement clone cooldown
+                int cooldown = player.getPersistentData().getInt("clone_cooldown");
+                if (cooldown > 0) {
+                    player.getPersistentData().putInt("clone_cooldown", cooldown - 1);
+                }
             }
         }
     }

@@ -1,7 +1,9 @@
 package com.uheroes.uheroesmod.client.event;
 
 import com.uheroes.uheroesmod.network.SizeChangePayload;
+import com.uheroes.uheroesmod.network.SummonClonePayload;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -15,6 +17,7 @@ public class KeybindManager {
 
     public static final KeyMapping GROW_KEY = new KeyMapping("key.uheroes.grow", GLFW.GLFW_KEY_G, "key.categories.uheroes");
     public static final KeyMapping SHRINK_KEY = new KeyMapping("key.uheroes.shrink", GLFW.GLFW_KEY_H, "key.categories.uheroes");
+    public static final KeyMapping SUMMON_CLONE_KEY = new KeyMapping("key.uheroes.summon_clone", GLFW.GLFW_KEY_C, "key.categories.uheroes");
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
@@ -24,6 +27,9 @@ public class KeybindManager {
         while (SHRINK_KEY.consumeClick()) {
             PacketDistributor.sendToServer(new SizeChangePayload(false));
         }
+        while (SUMMON_CLONE_KEY.consumeClick()) {
+            PacketDistributor.sendToServer(new SummonClonePayload(Screen.hasShiftDown()));
+        }
     }
 
     @EventBusSubscriber(modid = "uheroes", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -32,6 +38,7 @@ public class KeybindManager {
         public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
             event.register(GROW_KEY);
             event.register(SHRINK_KEY);
+            event.register(SUMMON_CLONE_KEY);
         }
     }
 }
