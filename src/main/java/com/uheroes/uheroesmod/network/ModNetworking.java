@@ -12,6 +12,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 @EventBusSubscriber(modid = "uheroes", bus = EventBusSubscriber.Bus.MOD)
 public class ModNetworking {
@@ -21,6 +23,7 @@ public class ModNetworking {
         final PayloadRegistrar registrar = event.registrar("uheroes");
         registrar.playToServer(HeroSelectPayload.TYPE, HeroSelectPayload.CODEC, ModNetworking::handleHeroSelect);
         registrar.playToClient(SyncHeroDataPayload.TYPE, SyncHeroDataPayload.CODEC, ModNetworking::handleSyncHeroData);
+        registrar.playToServer(SizeChangePayload.TYPE, SizeChangePayload.CODEC, ModNetworking::handleSizeChange);
     }
 
     private static void handleSyncHeroData(final SyncHeroDataPayload payload, final IPayloadContext context) {
@@ -52,6 +55,26 @@ public class ModNetworking {
                         SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 1.0F, 1.0F);
                 player.sendSystemMessage(Component.literal("You have awakened as BlackS."));
                 FluxData.syncToClient(player);
+            }
+        });
+    }
+
+    private static void handleSizeChange(final SizeChangePayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Player player = context.player();
+            if (player != null && player.getPersistentData().getBoolean("is_blacks")) {
+                ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
+                float currentScale = scaleData.getTargetScale();
+                float newScale;
+                
+                if (payload.isGrowing()) {
+                    newScale = Math.min(5.0f, currentScale + 1.0f);
+                } else {
+                    newScale = Math.max(0.1f, currentScale - 0.5f);
+                }
+                
+                scaleData.setTargetScale(newScale);
+                scaleData.setScaleTickDelay(100);
             }
         });
     }
