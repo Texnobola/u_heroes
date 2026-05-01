@@ -1,0 +1,13 @@
+{
+  "itemGroup.uheroes": "Example Mod Tab",
+  "block.uheroes.example_block": "Example Block",
+  "item.uheroes.example_item": "Example Item",
+
+  "uheroes.configuration.title": "u-heroes Configs",
+  "uheroes.configuration.section.uheroes.common.toml": "u-heroes Configs",
+  "uheroes.configuration.section.uheroes.common.toml.title": "u-heroes Configs",
+  "uheroes.configuration.items": "Item List",
+  "uheroes.configuration.logDirtBlock": "Log Dirt Block",
+  "uheroes.configuration.magicNumberIntroduction": "Magic Number Text",
+  "uheroes.configuration.magicNumber": "Magic Number"
+}
