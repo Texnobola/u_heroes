@@ -1,6 +1,7 @@
 package com.uheroes.uheroesmod.network;
 
 import com.uheroes.uheroesmod.registry.ModItems;
+import com.uheroes.uheroesmod.world.data.FluxData;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,6 +20,17 @@ public class ModNetworking {
     public static void register(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("uheroes");
         registrar.playToServer(HeroSelectPayload.TYPE, HeroSelectPayload.CODEC, ModNetworking::handleHeroSelect);
+        registrar.playToClient(SyncHeroDataPayload.TYPE, SyncHeroDataPayload.CODEC, ModNetworking::handleSyncHeroData);
+    }
+
+    private static void handleSyncHeroData(final SyncHeroDataPayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Player player = context.player();
+            if (player != null) {
+                player.getPersistentData().putBoolean("is_blacks", payload.isBlacks());
+                player.getPersistentData().putInt("uheroes_flux", payload.flux());
+            }
+        });
     }
 
     private static void handleHeroSelect(final HeroSelectPayload payload, final IPayloadContext context) {
@@ -39,6 +51,7 @@ public class ModNetworking {
                 player.level().playSound(null, player.getX(), player.getY(), player.getZ(), 
                         SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 1.0F, 1.0F);
                 player.sendSystemMessage(Component.literal("You have awakened as BlackS."));
+                FluxData.syncToClient(player);
             }
         });
     }

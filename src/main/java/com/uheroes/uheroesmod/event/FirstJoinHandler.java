@@ -1,6 +1,7 @@
 package com.uheroes.uheroesmod.event;
 
 import com.uheroes.uheroesmod.registry.ModItems;
+import com.uheroes.uheroesmod.world.data.FluxData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,6 +20,7 @@ public class FirstJoinHandler {
                 player.addItem(ModItems.HERO_CHOOSER.get().getDefaultInstance());
                 data.putBoolean("received_hero_chooser", true);
             }
+            FluxData.syncToClient(player);
         }
     }
 }
