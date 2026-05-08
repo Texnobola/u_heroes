@@ -8,10 +8,6 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.common.EventBusSubscriber;
-
-@EventBusSubscriber(modid = "uheroes", value = Dist.CLIENT)
 public class PlayerAnimationHandler {
 
     private static final ResourceLocation ATTACK_LAYER_ID = ResourceLocation.fromNamespaceAndPath("uheroes", "attack_layer");
