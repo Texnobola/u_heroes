@@ -30,6 +30,8 @@ public class ModNetworking {
         registrar.playToClient(SyncHeroDataPayload.TYPE, SyncHeroDataPayload.CODEC, ModNetworking::handleSyncHeroData);
         registrar.playToServer(SizeChangePayload.TYPE, SizeChangePayload.CODEC, ModNetworking::handleSizeChange);
         registrar.playToServer(SummonClonePayload.TYPE, SummonClonePayload.CODEC, ModNetworking::handleSummonClone);
+        registrar.playToServer(AttackPayload.TYPE, AttackPayload.CODEC, ModNetworking::handleAttack);
+        registrar.playToClient(AnimationSyncPayload.TYPE, AnimationSyncPayload.CODEC, ModNetworking::handleAnimationSync);
     }
 
     private static void handleSyncHeroData(final SyncHeroDataPayload payload, final IPayloadContext context) {
@@ -135,6 +137,46 @@ public class ModNetworking {
                     level.playSound(null, player.blockPosition(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.0f, 1.0f);
                     player.getPersistentData().putInt("clone_cooldown", cooldown);
                 }
+            }
+        });
+    }
+    private static void handleAttack(final AttackPayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Player player = context.player();
+            if (player == null || !player.getPersistentData().getBoolean("is_blacks")) return;
+
+            String cooldownKey = payload.attackType() == 1 ? "giant_fist_cooldown" : "long_slap_cooldown";
+            if (player.getPersistentData().getInt(cooldownKey) > 0) return;
+
+            float damage = payload.attackType() == 1 ? 16.0f : 10.0f;
+            int cooldown = payload.attackType() == 1 ? 200 : 100; // 10s and 5s
+            String animName = payload.attackType() == 1 ? "giant_fist" : "long_slap";
+            double range = payload.attackType() == 1 ? 5.0 : 8.0; // Long slap has more range?
+
+            // Simple raycast/AABB check for targets
+            net.minecraft.world.phys.Vec3 eyePos = player.getEyePosition();
+            net.minecraft.world.phys.Vec3 lookVec = player.getLookAngle();
+            net.minecraft.world.phys.Vec3 endPos = eyePos.add(lookVec.scale(range));
+            
+            net.minecraft.world.phys.AABB searchBox = player.getBoundingBox().expandTowards(lookVec.scale(range)).inflate(1.0);
+            for (net.minecraft.world.entity.Entity target : player.level().getEntities(player, searchBox)) {
+                if (target instanceof net.minecraft.world.entity.LivingEntity living && living.getBoundingBox().clip(eyePos, endPos).isPresent()) {
+                    living.hurt(player.damageSources().playerAttack(player), damage);
+                    break; // Hit one target for now
+                }
+            }
+
+            player.getPersistentData().putInt(cooldownKey, cooldown);
+            
+            // Sync animation to everyone
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayersInDimension((ServerLevel) player.level(), new AnimationSyncPayload(player.getUUID(), animName));
+        });
+    }
+
+    private static void handleAnimationSync(final AnimationSyncPayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player().level().getPlayerByUUID(payload.playerUUID()) instanceof net.minecraft.client.player.AbstractClientPlayer targetPlayer) {
+                com.uheroes.uheroesmod.client.animation.PlayerAnimationHandler.playAnimation(targetPlayer, payload.animationName());
             }
         });
     }

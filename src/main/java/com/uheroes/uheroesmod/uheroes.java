@@ -24,6 +24,7 @@ public class uheroes {
     }
 
     private void onClientSetup(final FMLClientSetupEvent event) {
+        com.uheroes.uheroesmod.client.animation.PlayerAnimationHandler.registerFactory();
     }
 
     @SubscribeEvent

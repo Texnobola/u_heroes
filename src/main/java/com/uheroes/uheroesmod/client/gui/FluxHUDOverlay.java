@@ -26,5 +26,13 @@ public class FluxHUDOverlay implements LayeredDraw.Layer {
         int y = minecraft.getWindow().getGuiScaledHeight() - 20;
 
         guiGraphics.drawString(minecraft.font, text, x, y, 0x00FFFF);
+
+        int gfCooldown = player.getPersistentData().getInt("giant_fist_cooldown");
+        String gfText = "Giant Fist: " + (gfCooldown > 0 ? (gfCooldown / 20) + "s" : "READY");
+        guiGraphics.drawString(minecraft.font, gfText, x, y - 10, gfCooldown > 0 ? 0xFF0000 : 0x00FF00);
+
+        int lsCooldown = player.getPersistentData().getInt("long_slap_cooldown");
+        String lsText = "Long Slap: " + (lsCooldown > 0 ? (lsCooldown / 20) + "s" : "READY");
+        guiGraphics.drawString(minecraft.font, lsText, x, y - 20, lsCooldown > 0 ? 0xFF0000 : 0x00FF00);
     }
 }

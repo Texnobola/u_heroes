@@ -1,5 +1,6 @@
 package com.uheroes.uheroesmod.client.event;
 
+import com.uheroes.uheroesmod.network.AttackPayload;
 import com.uheroes.uheroesmod.network.SizeChangePayload;
 import com.uheroes.uheroesmod.network.SummonClonePayload;
 import net.minecraft.client.KeyMapping;
@@ -18,6 +19,8 @@ public class KeybindManager {
     public static final KeyMapping GROW_KEY = new KeyMapping("key.uheroes.grow", GLFW.GLFW_KEY_G, "key.categories.uheroes");
     public static final KeyMapping SHRINK_KEY = new KeyMapping("key.uheroes.shrink", GLFW.GLFW_KEY_H, "key.categories.uheroes");
     public static final KeyMapping SUMMON_CLONE_KEY = new KeyMapping("key.uheroes.summon_clone", GLFW.GLFW_KEY_C, "key.categories.uheroes");
+    public static final KeyMapping GIANT_FIST_KEY = new KeyMapping("key.uheroes.giant_fist", GLFW.GLFW_KEY_V, "key.categories.uheroes");
+    public static final KeyMapping LONG_SLAP_KEY = new KeyMapping("key.uheroes.long_slap", GLFW.GLFW_KEY_B, "key.categories.uheroes");
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
@@ -30,6 +33,12 @@ public class KeybindManager {
         while (SUMMON_CLONE_KEY.consumeClick()) {
             PacketDistributor.sendToServer(new SummonClonePayload(Screen.hasShiftDown()));
         }
+        while (GIANT_FIST_KEY.consumeClick()) {
+            PacketDistributor.sendToServer(new AttackPayload(1));
+        }
+        while (LONG_SLAP_KEY.consumeClick()) {
+            PacketDistributor.sendToServer(new AttackPayload(2));
+        }
     }
 
     @EventBusSubscriber(modid = "uheroes", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -39,6 +48,8 @@ public class KeybindManager {
             event.register(GROW_KEY);
             event.register(SHRINK_KEY);
             event.register(SUMMON_CLONE_KEY);
+            event.register(GIANT_FIST_KEY);
+            event.register(LONG_SLAP_KEY);
         }
     }
 }

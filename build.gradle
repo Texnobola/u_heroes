@@ -148,6 +148,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     implementation "maven.modrinth:pehkui:3.8.3+1.21-neoforge"
+    implementation "maven.modrinth:geckolib:${geckolib_version}"
+    implementation "maven.modrinth:playeranimator:${playeranimator_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

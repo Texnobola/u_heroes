@@ -24,3 +24,17 @@ U-Heroes mod.
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.uheroes]]
+    modId="geckolib"
+    type="required"
+    versionRange="[4.8,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.uheroes]]
+    modId="playeranimator"
+    type="required"
+    versionRange="[2.0,)"
+    ordering="NONE"
+    side="BOTH"

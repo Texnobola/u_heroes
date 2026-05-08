@@ -41,6 +41,17 @@ public class SizeTickHandler {
                 if (cooldown > 0) {
                     player.getPersistentData().putInt("clone_cooldown", cooldown - 1);
                 }
+
+                // Decrement attack cooldowns
+                int gfCooldown = player.getPersistentData().getInt("giant_fist_cooldown");
+                if (gfCooldown > 0) {
+                    player.getPersistentData().putInt("giant_fist_cooldown", gfCooldown - 1);
+                }
+
+                int lsCooldown = player.getPersistentData().getInt("long_slap_cooldown");
+                if (lsCooldown > 0) {
+                    player.getPersistentData().putInt("long_slap_cooldown", lsCooldown - 1);
+                }
             }
         }
     }
