@@ -10,6 +10,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 @EventBusSubscriber(modid = "uheroes")
 public class SizeTickHandler {
@@ -54,5 +55,18 @@ public class SizeTickHandler {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        Player oldPlayer = event.getOriginal();
+        Player newPlayer = event.getEntity();
+        
+        // Copy persistent data
+        newPlayer.getPersistentData().putBoolean("is_blacks", oldPlayer.getPersistentData().getBoolean("is_blacks"));
+        newPlayer.getPersistentData().putInt("uheroes_flux", oldPlayer.getPersistentData().getInt("uheroes_flux"));
+        newPlayer.getPersistentData().putInt("clone_cooldown", oldPlayer.getPersistentData().getInt("clone_cooldown"));
+        newPlayer.getPersistentData().putInt("giant_fist_cooldown", oldPlayer.getPersistentData().getInt("giant_fist_cooldown"));
+        newPlayer.getPersistentData().putInt("long_slap_cooldown", oldPlayer.getPersistentData().getInt("long_slap_cooldown"));
     }
 }
